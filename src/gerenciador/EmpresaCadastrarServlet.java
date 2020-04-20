@@ -14,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import dao.EmpresaDAO;
 import model.Empresa;
@@ -37,24 +38,29 @@ public class EmpresaCadastrarServlet extends HttpServlet{
 			
 			System.out.println("Nome Fantasia...: " + nomeFantasia);
 			System.out.println("Data Abertura...: " + dataAbertura);
-			
-			
-			Empresa empresa = new Empresa(nomeFantasia, data);
-			EmpresaDAO empresaDAO = new EmpresaDAO();
-			empresaDAO.add(empresa);
-			
-			List<Empresa> empresas = empresaDAO.getAll();
-			req.setAttribute("empresas", empresas);
-			
-			RequestDispatcher rd = req.getRequestDispatcher("EmpresaListagem.jsp");
-			rd.forward(req, resp);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 		
+		Empresa empresa = new Empresa(nomeFantasia, data);
+		EmpresaDAO empresaDAO = new EmpresaDAO();
+		empresaDAO.add(empresa);
 		
+		HttpSession session = req.getSession();
+		session.setAttribute("empresa", empresa);//Empresa Cadastrada
 		
+		List<Empresa> empresas = empresaDAO.getAll();
+		req.setAttribute("empresas", empresas);
 		
+		resp.sendRedirect("EmpresaListar");
+		
+//		RequestDispatcher rd = req.getRequestDispatcher("EmpresaListagem.jsp");
+//		rd.forward(req, resp);
+	}
+	
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		req.getRequestDispatcher("/EmpresaCadastrar.jsp").forward(req, resp);
 	}
 	
 	
